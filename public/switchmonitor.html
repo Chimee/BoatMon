@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css">
+  
+  <script src="/jquery/dist/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+	    <meta charset="utf-8"> 
+
+
+ </head>
+  <body>
+   
+  
+    
+
+	
+<h1 = "title" >Current Pump States</h1>
+	<div class="container">
+  <div class="jumbotron">
+        <div class="row">
+  		  <div class="col-xs-4">
+  			<h2>Front</h2>
+ 			<button id="frontswitch" type="button" class="btn btn-info">Off</button>
+		  </div>
+		
+		
+          <div class="col-xs-4">
+  			<h2>Center</h2>
+ 			<button id="centerswitch" type="button" class="btn btn-info">Off</button>
+	  	  </div>
+	  	  
+	  	  
+		</div>
+		
+        <div class="row">
+        
+          <div class="col-xs-4">
+  			<h2>L-Rear</h2>
+ 			<button id="leftrearswitch" type="button" class="btn btn-info">Off</button>
+		  </div>
+		
+		
+       	  <div class="col-xs-4">
+  			<h2>R-Rear</h2>
+ 			<button id="rightrearswitch" type="button" class="btn btn-info">Off</button>
+		  </div>
+		  
+		</div>
+		
+        <div class="row">
+        
+        <div class="col-xs-4">
+  			<h2>Bilge 1</h2>
+ 			<button id="bilge1switch" type="button" class="btn btn-info">Off</button>
+		</div>
+		
+		
+        <div class="col-xs-4">
+  			<h2>Bilge 2</h2>
+ 			<button id="button" type="button" class="btn btn-info">Off</button>
+		</div>
+		
+		
+       <div class="col-xs-4">
+  			<h2>Bilge 3</h2>
+ 			<button id="button" type="button" class="btn btn-info">Off</button>
+ 	   </div>
+ 	   
+ 	   
+ 	   	
+		</div>				 		 		
+  </div>
+ </div>
+ 
+
+
+ 
+ <script>
+      var socket = io.connect();
+     
+        
+      
+	
+	    var newrate = 'acdcd'
+      
+	    $(document).off('click', '#getrates').on('click', '#getrates', function () {
+	    	$('#frontswitch').text('Fill Active')
+	    	document.getElementById('frontswitch').style.background = "green";
+            console.log('Requescting Rates Refresh');
+            socket.emit('getratesclicked');
+	    
+	     });
+		 
+	    $(document).off('click', '#getrates2').on('click', '#getrates2', function () {
+	    	$('#frontswitch').text('Drain Active')
+            console.log('Requesting Rates Refresh');
+            socket.emit('getratesclicked');
+	    
+	     });
+		 
+		 
+		 setInterval(function(){
+		 socket.emit('RefreshStates')
+		 console.log('Polling Server For States');
+		 }, 5000);
+		 
+		 socket.on('SwitchPolling', function(data){
+		console.log("New States:  P1F: " + data.P1F + " P1D: "+ data.P1D+ " P2F: "+ data.P2F + " P2D: "+ data.P2D + " P3F: " + data.P3F + " P3D: " + data.P3D + " P4F: " + data.P4F + " P4D: " + data.P4D + " B1C: " + data.B1C + " B1R: " + data.B1R);
+					//data.P2D = 1; Test Manually Setting Pump State
+		//Check Pump Set 1 Conditions			
+		if (data.P1F == 1)
+		{
+		$('#frontswitch').text("Fill Active")
+		document.getElementById('frontswitch').style.background = "green";
+		}
+		if  (data.P1D == 1)
+		{$('#frontswitch').text("Drain Active")
+		document.getElementById('frontswitch').style.background = "red";
+		}
+		if  (data.P1D == 0 &&  data.P1F == 0)
+		{$('#frontswitch').text("OFF")
+		document.getElementById('frontswitch').style.background = "gray";
+		}
+		
+		
+		//Check Pump Set 2 Conditions
+		if (data.P2F == 1)
+		{
+		$('#centerswitch').text("Fill Active")
+		document.getElementById('centerswitch').style.background = "green";
+		}
+		if  (data.P2D == 1)
+		{$('#centerswitch').text("Drain Active")
+		document.getElementById('centerswitch').style.background = "red";
+		}
+		if  (data.P2D == 0 &&  data.P2F == 0)
+		{$('#centerswitch').text("OFF")
+		document.getElementById('centerswitch').style.background = "gray";
+		}
+		
+		
+		//Check Pump Set 3 Conditions
+		if (data.P3F == 1)
+		{
+		$('#leftrearswitch').text("Fill Active")
+		document.getElementById('leftrearswitch').style.background = "green";
+		}
+		if  (data.P3D == 1)
+		{$('#leftrearswitch').text("Drain Active")
+		document.getElementById('leftrearswitch').style.background = "red";
+		}
+		if  (data.P3D == 0 &&  data.P3F == 0)
+		{$('#leftrearswitch').text("OFF")
+		document.getElementById('leftrearswitch').style.background = "gray";
+		}
+		
+		//Check Pump Set 4 Conditions
+		if (data.P4F == 1)
+		{
+		$('#rightrearswitch').text("Fill Active")
+		document.getElementById('rightrearswitch').style.background = "green";
+		}
+		else if  (data.P4D == 1)
+		{$('#rightrearswitch').text("Drain Active")
+		document.getElementById('rightrearswitch').style.background = "red";
+
+		}
+		else if  (data.P4D == 0 &&  data.P4F == 0)
+		{$('#rightrearswitch').text("OFF")
+		document.getElementById('rightrearswitch').style.background = "gray";
+
+		}
+
+		//Check BIlge Pump Conditions
+		if (data.B1C == 1)
+		{
+		$('#bilge1switch').text("Center Active")
+		document.getElementById('bilge1switch').style.background = "green";
+
+		}
+		else if  (data.B1R == 1)
+		{$('#bilge1switch').text("Rear Active")
+		document.getElementById('bilge1switch').style.background = "red";
+
+		}
+		else if  (data.B1C == 0 &&  data.B1R == 0)
+		{$('#bilge1switch').text("OFF")
+		document.getElementById('bilge1switch').style.background = "gray";
+		
+
+		}
+		
+		});
+		
+
+				
+          
+	    
+    </script>
+  </body>
+</html>
